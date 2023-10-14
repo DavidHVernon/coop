@@ -8,5 +8,5 @@ rm lex.yy.c y.tab.c y.tab.h y.output
 lex lex.l                           
 yacc -v -d yacc.y
 
-clang lex.yy.c y.tab.c y.tab.c -o s
+clang lex.yy.c y.tab.c main.c -o s
 
