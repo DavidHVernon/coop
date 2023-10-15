@@ -3,5 +3,8 @@
 #set -e 
 set -x 
 
-rm lex.yy.c y.tab.c y.tab.h y.output s
+pushd rust
+cargo clean
+popd
 
+rm -rf ./c/build

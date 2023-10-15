@@ -3,10 +3,24 @@
 #set -e 
 set -x 
 
-rm lex.yy.c y.tab.c y.tab.h y.output
+# Build rust library
+pushd "./rust"
+cargo build 
+popd 
 
-lex lex.l                           
-yacc -v -d yacc.y
+# Build c program
+pushd "./c"
+if [ -d ./build ]; then
+    rm -rf "./build"
+fi
+mkdir "./build"
+pushd "./build"
 
-clang lex.yy.c y.tab.c main.c -o s
+lex ../src/lex.l                           
+yacc -v -d ../src/yacc.y
+clang lex.yy.c y.tab.c ../src/main.c -L ../../rust/target/debug -lrust -o coop
 
+popd
+popd
+
+mv ./c/build/coop .

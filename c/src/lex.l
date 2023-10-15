@@ -12,6 +12,7 @@ IS			(u|U|l|L)*
 void count();
 void comment(void);
 int check_type();
+int ret(const char * yytext, int retVal);
 
 %}
 
@@ -51,18 +52,18 @@ int check_type();
 "volatile"		{ count(); return(VOLATILE); }
 "while"			{ count(); return(WHILE); }
 
-{L}({L}|{D})*		{ count(); return(check_type()); }
+{L}({L}|{D})*	{ count(); return(check_type()); }
 
-0[xX]{H}+{IS}?		{ count(); return(CONSTANT); }
-0{D}+{IS}?		{ count(); return(CONSTANT); }
-{D}+{IS}?		{ count(); return(CONSTANT); }
-L?'(\\.|[^\\'])+'	{ count(); return(CONSTANT); }
+0[xX]{H}+{IS}?		{ count(); ret(yytext, CONSTANT); }
+0{D}+{IS}?			{ count(); ret(yytext, CONSTANT); }
+{D}+{IS}?			{ count(); ret(yytext, CONSTANT); }
+L?'(\\.|[^\\'])+'	{ count(); ret(yytext, CONSTANT); }
 
-{D}+{E}{FS}?		{ count(); return(CONSTANT); }
-{D}*"."{D}+({E})?{FS}?	{ count(); return(CONSTANT); }
-{D}+"."{D}*({E})?{FS}?	{ count(); return(CONSTANT); }
+{D}+{E}{FS}?			{ count(); return ret(yytext, CONSTANT); }
+{D}*"."{D}+({E})?{FS}?	{ count(); return ret(yytext, CONSTANT); }
+{D}+"."{D}*({E})?{FS}?	{ count(); return ret(yytext, CONSTANT); }
 
-L?\"(\\.|[^\\"])*\"	{ count(); return(STRING_LITERAL); }
+L?\"(\\.|[^\\"])*\"	{ count(); return ret(yytext, STRING_LITERAL); }
 
 "..."			{ count(); return(ELLIPSIS); }
 ">>="			{ count(); return(RIGHT_ASSIGN); }
@@ -121,6 +122,10 @@ int yywrap()
 	return(1);
 }
 
+int ret(const char * yytext, int retVal) {
+	yylval.s_val = yytext;
+	return retVal;
+}
 
 void comment(void )
 {
